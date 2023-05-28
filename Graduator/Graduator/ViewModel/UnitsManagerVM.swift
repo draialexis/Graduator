@@ -14,7 +14,7 @@ extension UnitsManager {
     
     var data: Data {
         Data(
-            units: self.getUnits().map{ $0.data }
+            units: self.units.map{ $0.data }
         )
     }
     
@@ -43,76 +43,37 @@ extension UnitsManager {
 
 class UnitsManagerVM : ObservableObject {
     
-    var original: UnitsManager
+    private var original: UnitsManager
     @Published var model: UnitsManager.Data
     @Published var isEdited: Bool = false
+    @Published var isAllEditable: Bool = false
 
     private var unitsVM: [UnitVM]
     
-    public var UnitsVM: [UnitVM] {
-        unitsVM
-    }
-     
+    public var UnitsVM: [UnitVM] { unitsVM }
+    
     init(unitsManager: UnitsManager) {
         original = unitsManager
         model = original.data
-        unitsVM = unitsManager.getUnits().map {
-            UnitVM(unit: $0)
-        }
+        unitsVM = unitsManager.units.map { UnitVM(unit: $0) }
     }
-
+    
     convenience init() {
-        self.init(unitsManager: UnitsManager(units: Stub.units))
+        self.init(unitsManager: UnitsManager(units: []))
     }
     
-    func onEditing() {
+    func updateUnit(_ unitVM: UnitVM) {
+        guard let index = unitsVM.firstIndex(where: { $0.id == unitVM.id }) else { return }
+        let updatedUnit = unitsVM[index].model
+        original.units[index].update(from: updatedUnit)
         model = original.data
-        isEdited = true
-    }
-    
-    func onEdited(isCancelled: Bool = false) {
-        if(!isCancelled && isEdited){
-            original.update(from: model)
-        }
-        isEdited = false
     }
     
     var TotalAverage: Double? {
-        return getAverage(unitsVM: self.unitsVM)
+        return original.getTotalAverage()
     }
 
     var ProfessionalAverage: Double? {
-        return getAverage(unitsVM: self.unitsVM.filter { $0.model.isProfessional })
+        return original.getProfessionalAverage()
     }
-
-    private func getAverage(unitsVM: [UnitVM]) -> Double? {
-        var totalWeight = 0
-        var weightedSum = 0.0
-
-        for unitVM in unitsVM {
-            if let grade = unitVM.Average {
-                totalWeight += unitVM.model.weight
-                weightedSum += grade * Double(unitVM.model.weight)
-            }
-        }
-        
-        guard totalWeight > 0 else { return nil }
-        
-        return weightedSum / Double(totalWeight)
-    }
-    
-    // FIXME fix this nightmare after resting and doing Subject first
-    /*
-    func updateUnit(id: UUID, unitVM: UnitVM) -> UnitVM? {
-        if let index = unitsVM.firstIndex(where: { $0.model.id == id }) {
-            original.updateUnit(id: id, unit: Unit(unitsVM[index].original))
-            return unitVM
-        } else {
-            return nil
-        }
-    }
-     */
 }
-
-
-

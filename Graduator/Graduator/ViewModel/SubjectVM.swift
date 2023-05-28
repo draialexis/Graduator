@@ -16,14 +16,6 @@ extension Subject {
         var isCalled: Bool
     }
     
-    init(subjectData: Subject.Data) {
-        self.id = subjectData.id
-        self.name = subjectData.name
-        self.weight = subjectData.weight
-        self.grade = subjectData.grade
-        self.isCalled = subjectData.isCalled
-    }
-    
     var data: Data {
         Data(
             id: self.id,
@@ -35,21 +27,30 @@ extension Subject {
     }
     
     mutating func update(from data: Data) {
-        // FIXME improve the guard
-        guard (data.id == self.data.id
-               && (self.isCalled == false || data.isCalled == false)
-               && (data.grade != nil || data.isCalled == false))
-        else { return }
-        
-        self.name = data.name
-        self.weight = data.weight
-        self.grade = data.grade
+        // papers please
+        guard data.id == self.data.id else { return }
+        // can't update grade if this subject is called, unless the update is to 'un-call' the subject
+        guard !(self.isCalled && data.isCalled && self.grade != data.grade) else { return }
+        // can't update a subject to become called and have a nil grade at the same time
+        guard !(data.grade == nil && data.isCalled) else { return }
+
+        if (!data.name.isEmpty) {
+            self.name = data.name
+        }
+        self.weight = max(abs(data.weight), 1)
+        if let grade = data.grade {
+            self.grade = max(abs(grade), 0.0)
+        } else {
+            self.grade = nil
+        }
         self.isCalled = data.isCalled
     }
+
 }
 
-class SubjectVM : ObservableObject {
-    var original: Subject
+class SubjectVM : ObservableObject, Identifiable {
+    private var original: Subject
+    var id: UUID { original.id }
     @Published var model: Subject.Data
     @Published var isEdited: Bool = false
     
@@ -58,17 +59,11 @@ class SubjectVM : ObservableObject {
         model = original.data
     }
     
-    init(subjectData: Subject.Data) {
-        self.original = Subject(subjectData: subjectData)
-        self.model = subjectData
-    }
-    
     convenience init() {
         self.init(subject: Subject(
             id: UUID(),
             name: "",
             weight: 1,
-            grade: 10.0,
             isCalled: false
         ))
     }
@@ -78,15 +73,11 @@ class SubjectVM : ObservableObject {
         isEdited = true
     }
     
-    // TODO add suitable error handling for cases where the user enters an invalid number. (negative numbers are forbidden... Do we need to guard against NaN and nil as well?)
     func onEdited(isCancelled: Bool = false) {
-        if(!isCancelled && isEdited){
+        if(!isCancelled && original.gradeIsValid(model.grade)){
             original.update(from: model)
         }
+        model = original.data
         isEdited = false
-    }
-    
-    var HasGrade: Bool {
-        return model.grade != nil
     }
 }

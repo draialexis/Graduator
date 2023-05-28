@@ -10,44 +10,28 @@ import Foundation
 struct UnitsManager {
     
     var units: [Unit]
-
-    init(units: [Unit]) {
-        self.units = units
+    
+    func getTotalAverage() -> Double? {
+        return getAverage(units: units)
     }
     
-    func getUnits() -> [Unit] {
-        return units
+    func getProfessionalAverage() -> Double? {
+        return getAverage(units: units.filter { $0.isProfessional })
     }
     
-    func getUnit(id: UUID) -> Unit? {
-        if let index = getIndex(id: id) {
-            return units[index]
-        } else {
-            return nil
-        }
-    }
+    func getAverage(units: [Unit]) -> Double? {
+        var totalWeight = 0
+        var weightedSum = 0.0
 
-    mutating func addUnit(unit: Unit) -> Unit {
-        units.append(unit)
-        return unit
-    }
-
-    mutating func updateUnit(id: UUID, unit: Unit) -> Unit? {
-        if let index = getIndex(id: id) {
-            units[index] = unit
-            return unit
-        } else {
-            return nil
+        for unit in units {
+            if let grade = unit.getAverage() {
+                totalWeight += unit.weight
+                weightedSum += grade * Double(unit.weight)
+            }
         }
-    }
-
-    mutating func removeUnit(id: UUID) {
-        if let index = getIndex(id: id) {
-            units.remove(at: index)
-        }
-    }
-    
-    private func getIndex(id: UUID) -> Int? {
-        return units.firstIndex(where: { $0.id == id })
+        
+        guard totalWeight > 0 else { return nil }
+        
+        return weightedSum / Double(totalWeight)
     }
 }

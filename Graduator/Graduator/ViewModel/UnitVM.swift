@@ -14,7 +14,7 @@ extension Unit {
         var weight: Int
         var isProfessional: Bool
         var code: Int
-        public var subjects: [Subject.Data] = []
+        var subjects: [Subject.Data] = []
     }
     
     var data: Data {
@@ -24,16 +24,16 @@ extension Unit {
             weight: self.weight,
             isProfessional: self.isProfessional,
             code: self.code,
-            subjects: self.subjects.map{ $0.data }
+            subjects: self.subjects.map { $0.data }
         )
     }
     
-    
-    // TODO ? Maybe check that we're not setting isCalled to true on a subject with a nil grade. Keep in mind that's what we already did in SubjectVM's update function
     mutating func update(from data: Data) {
         guard self.id == data.id else {return}
-        self.name = data.name
-        self.weight = data.weight
+        if (!data.name.isEmpty) {
+            self.name = data.name
+        }
+        self.weight = max(abs(data.weight), 1)
         self.isProfessional = data.isProfessional
         self.code = data.code
         self.subjects = data.subjects.map {
@@ -48,15 +48,20 @@ extension Unit {
     }
 }
 
-class UnitVM : ObservableObject {
-    var original: Unit
+class UnitVM : ObservableObject, Identifiable {
+    private var original: Unit
+    var id: UUID { original.id }
     @Published var model: Unit.Data
     @Published var isEdited: Bool = false
     
+    private var subjectsVM: [SubjectVM]
+    
+    public var SubjectsVM: [SubjectVM] { subjectsVM }
     
     init(unit: Unit) {
         original = unit
         model = original.data
+        subjectsVM = unit.subjects.map { SubjectVM(subject: $0) }
     }
     
     convenience init() {
@@ -76,32 +81,44 @@ class UnitVM : ObservableObject {
     }
     
     func onEdited(isCancelled: Bool = false) {
-        if(!isCancelled && isEdited){
+        if(!isCancelled){
             original.update(from: model)
         }
+        model = original.data
         isEdited = false
     }
     
-    // TODO Maybe move this to the model?
-    var Average: Double? {
-        var totalWeight = 0
-        var weightedSum = 0.0
-
-        for subject in model.subjects {
-            if let grade = subject.grade {
-                totalWeight += subject.weight
-                weightedSum += grade * Double(subject.weight)
-            }
+    func updateSubject(_ subjectVM: SubjectVM) {
+        guard let index = subjectsVM.firstIndex(where: { $0.id == subjectVM.id }) else { return }
+        let updatedSubject = subjectsVM[index].model
+        original.subjects[index].update(from: updatedSubject)
+        model = original.data
+    }
+    
+    func updateAllSubjects() {
+        for subjectVM in subjectsVM {
+            updateSubject(subjectVM)
         }
-
-        guard totalWeight > 0 else { return nil }
-
-        return weightedSum / Double(totalWeight)
+    }
+    
+    func deleteSubject(_ subjectVM: SubjectVM) {
+        guard let index = subjectsVM.firstIndex(where: { $0.id == subjectVM.id }) else { return }
+        subjectsVM.remove(at: index)
+        original.subjects.remove(at: index)
+        model = original.data
+    }
+    
+    func addSubject(_ subject: Subject) {
+        subjectsVM.append(SubjectVM(subject: subject))
+        original.subjects.append(subject)
+        model = original.data
+    }
+    
+    var Average: Double? {
+        return original.getAverage()
     }
 
-    var isCalled: Bool {
-        // FIXME this is false if any suject therein has a nil grade. This is true if all subjects therein are locked
-        // also check if this can stay a function, or if it would be better as a calculated property
-        return false
+    var IsCalled: Bool {
+        return original.subjects.allSatisfy { $0.isCalled }
     }
 }

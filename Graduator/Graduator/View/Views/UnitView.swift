@@ -9,53 +9,140 @@ import SwiftUI
 
 struct UnitView: View {
     @ObservedObject var unitVM: UnitVM
+    @ObservedObject var unitsManagerVM: UnitsManagerVM
 
+    @State private var showAlert = false
+    @State private var showingForm: Bool = false
+    var formVM = SubjectFormVM()
+    
+    private func delete(at offsets: IndexSet) {
+        guard let index = offsets.first else { return }
+        let subjectVMToDelete = unitVM.SubjectsVM[index]
+        unitVM.deleteSubject(subjectVMToDelete)
+        unitsManagerVM.updateUnit(unitVM)
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Unit title")
-                .font(.title)
-                .padding()
+            HStack {
+                Text("UE " + String(unitVM.model.code))
+                Text(unitVM.model.name)
+            }
+            .font(.title)
+            .padding()
             
-            UnitViewCell(unitVM: unitVM)
+            UnitViewCell(
+                unitVM: unitVM,
+                unitsManagerVM: unitsManagerVM
+            )
             
             Divider()
             
             HStack {
-                // TODO later add cross image (multiply)
-                Text("coefficient : " + "weight")
+                Image(systemName: "multiply.circle.fill")
+                Text(String(format: "coefficient : %d", unitVM.model.weight))
             }
             .padding(.horizontal)
             
             HStack {
-                // TODO later add page with scribbling image
+                Image(systemName: "magnifyingglass.circle")
                 Text("Détail des notes")
             }
             .padding(.horizontal)
 
-            ScrollView {
-                ForEach(unitVM.model.subjects) { subjectData in
-                    // You need to convert subjectData into SubjectVM, then use it to create SubjectViewCell
-                    let subjectVM = SubjectVM(subjectData: subjectData)
-                    SubjectViewCell(subjectVM: subjectVM)
+            
+            List {
+                if unitsManagerVM.isAllEditable {
+                    ForEach(unitVM.SubjectsVM) { subjectVM in
+                        SubjectViewCell(
+                            subjectVM: subjectVM,
+                            unitVM: unitVM,
+                            unitsManagerVM: unitsManagerVM
+                        )
+                    }
+                    .onDelete(perform: delete)
+                } else {
+                    ForEach(unitVM.SubjectsVM) { subjectVM in
+                        SubjectViewCell(
+                            subjectVM: subjectVM,
+                            unitVM: unitVM,
+                            unitsManagerVM: unitsManagerVM
+                        )
+                    }
                 }
             }
-            .navigationBarItems(trailing: Button(action: {
-                // TODO later: Add action for button. Make editable
-                // * unit weight
-                // * unit description
-                // * subjects
-                //   * make all fields editable (just toggle isEditable is the SubjectCellView?)
-                //   * create new subject (creation screen with simple form for name, weight, code, isCalled. Of course, will need to deal with adding it to the unitVM, updating the unitVM, and updating the unitsmanagerVM with the new unitVM. Check the result to make sure that the model does get updated by the VM in the end)
-                //   * delete a subject (again, this has repercusions for the unit and the unitmanager, be careful)
-            }) {
-                Text("Edit")
+            .navigationBarItems(trailing: HStack {
+                if unitsManagerVM.isAllEditable {
+                    Button(action: { showingForm = true }) {
+                        Image(systemName: "plus")
+                    }
+                    Button(action: {
+                        unitsManagerVM.isAllEditable.toggle()
+                        unitVM.onEdited(isCancelled: true)
+                    }) {
+                        Text("Annuler")
+                    }
+                    Button(action: {
+                        unitsManagerVM.isAllEditable.toggle()
+                        unitVM.onEdited()
+                        unitVM.updateAllSubjects()
+                        unitsManagerVM.updateUnit(unitVM)
+                    }) {
+                        Text("OK")
+                    }
+                } else {
+                    Button(action: {
+                        unitsManagerVM.isAllEditable.toggle()
+                        unitVM.onEditing()
+                    }) {
+                        Text("Modifier")
+                    }
+                }
             })
+            .sheet(isPresented: $showingForm) {
+                NavigationView {
+                    SubjectFormView(formVM: formVM)
+                        .navigationTitle("Nouvelle matière")
+                        .navigationBarItems(
+                            leading: Button("Annuler") { showingForm = false },
+                            trailing: Button("Enregistrer") {
+                                if let newSubject = formVM.createSubject() {
+                                    unitVM.addSubject(newSubject)
+                                    unitsManagerVM.updateUnit(unitVM)
+                                    showingForm = false
+                                } else {
+                                    showAlert = true
+                                }
+                            }.alert(isPresented: $showAlert) {
+                                Alert(title: Text("Annulé: matière invalide"),
+                                      message: Text("C'est un peu plus compliqué que ça..."),
+                                      dismissButton: .default(Text("OK")))
+                            })
+                }
+            }
         }
+        // If user navigates back while editing but before clicking 'OK', the changes are cancelled
+        .onDisappear(perform: {
+            if unitsManagerVM.isAllEditable {
+                unitVM.onEdited(isCancelled: true)
+                unitsManagerVM.isAllEditable = false
+            }
+        })
     }
 }
 
 struct UnitView_Previews: PreviewProvider {
+    
+    static var ManagerVMStub: UnitsManagerVM = UnitsManagerVM(
+        unitsManager: UnitsManager(
+            units: Stub.units
+        )
+    )
+    
     static var previews: some View {
-        UnitView(unitVM: UnitVM(unit: Stub.units[5]))
+        UnitView(
+            unitVM: ManagerVMStub.UnitsVM[0],
+            unitsManagerVM: ManagerVMStub
+        )
     }
 }

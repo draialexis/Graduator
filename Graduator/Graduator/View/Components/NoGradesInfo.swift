@@ -11,8 +11,14 @@ struct NoGradesInfo: View {
     var body: some View {
         HStack {
             Text("Aucune note enregistrée")
-                .font(.caption)
             Spacer()
         }
+    }
+}
+
+
+struct NoGradesInfo_Previews: PreviewProvider {
+    static var previews: some View {
+        NoGradesInfo()
     }
 }

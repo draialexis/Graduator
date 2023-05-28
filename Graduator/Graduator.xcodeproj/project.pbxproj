@@ -18,6 +18,9 @@
 		EC242B832A1FAA9B006FE760 /* Stub.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC242B822A1FAA9B006FE760 /* Stub.swift */; };
 		EC242B882A1FC605006FE760 /* NoGradesInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC242B872A1FC605006FE760 /* NoGradesInfo.swift */; };
 		EC242B8A2A1FCECA006FE760 /* AverageBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC242B892A1FCECA006FE760 /* AverageBlockView.swift */; };
+		EC5FE5A52A20882F0028AA5F /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC5FE5A42A20882F0028AA5F /* Formatters.swift */; };
+		ECB2FFCE2A23C4A700FF9F91 /* SubjectFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB2FFCD2A23C4A700FF9F91 /* SubjectFormView.swift */; };
+		ECB2FFD02A23C4B700FF9F91 /* SubjectFormVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB2FFCF2A23C4B700FF9F91 /* SubjectFormVM.swift */; };
 		ECC581D22A1D085B006C55EF /* GraduatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECC581D12A1D085B006C55EF /* GraduatorApp.swift */; };
 		ECC581D62A1D085C006C55EF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECC581D52A1D085C006C55EF /* Assets.xcassets */; };
 		ECC581D92A1D085C006C55EF /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECC581D82A1D085C006C55EF /* Preview Assets.xcassets */; };
@@ -37,6 +40,9 @@
 		EC242B822A1FAA9B006FE760 /* Stub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stub.swift; sourceTree = "<group>"; };
 		EC242B872A1FC605006FE760 /* NoGradesInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoGradesInfo.swift; sourceTree = "<group>"; };
 		EC242B892A1FCECA006FE760 /* AverageBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AverageBlockView.swift; sourceTree = "<group>"; };
+		EC5FE5A42A20882F0028AA5F /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
+		ECB2FFCD2A23C4A700FF9F91 /* SubjectFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectFormView.swift; sourceTree = "<group>"; };
+		ECB2FFCF2A23C4B700FF9F91 /* SubjectFormVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectFormVM.swift; sourceTree = "<group>"; };
 		ECC581CE2A1D085B006C55EF /* Graduator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Graduator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECC581D12A1D085B006C55EF /* GraduatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraduatorApp.swift; sourceTree = "<group>"; };
 		ECC581D52A1D085C006C55EF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -59,7 +65,9 @@
 		EC242B6F2A1F8260006FE760 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				EC242B862A1FC5EC006FE760 /* Bits */,
+				ECB2FFCC2A23C49500FF9F91 /* Forms */,
+				EC5FE5A32A20881B0028AA5F /* Utils */,
+				EC242B862A1FC5EC006FE760 /* Components */,
 				EC242B772A1F834C006FE760 /* Cells */,
 				EC242B762A1F8345006FE760 /* Views */,
 			);
@@ -83,13 +91,29 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
-		EC242B862A1FC5EC006FE760 /* Bits */ = {
+		EC242B862A1FC5EC006FE760 /* Components */ = {
 			isa = PBXGroup;
 			children = (
 				EC242B872A1FC605006FE760 /* NoGradesInfo.swift */,
 				EC242B892A1FCECA006FE760 /* AverageBlockView.swift */,
 			);
-			path = Bits;
+			path = Components;
+			sourceTree = "<group>";
+		};
+		EC5FE5A32A20881B0028AA5F /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				EC5FE5A42A20882F0028AA5F /* Formatters.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		ECB2FFCC2A23C49500FF9F91 /* Forms */ = {
+			isa = PBXGroup;
+			children = (
+				ECB2FFCD2A23C4A700FF9F91 /* SubjectFormView.swift */,
+			);
+			path = Forms;
 			sourceTree = "<group>";
 		};
 		ECC581C52A1D085B006C55EF = {
@@ -137,6 +161,7 @@
 				ECC581E02A1D08DB006C55EF /* SubjectVM.swift */,
 				ECC581E42A1D0C44006C55EF /* UnitVM.swift */,
 				EC242B7E2A1F83BF006FE760 /* UnitsManagerVM.swift */,
+				ECB2FFCF2A23C4B700FF9F91 /* SubjectFormVM.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -221,13 +246,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECB2FFCE2A23C4A700FF9F91 /* SubjectFormView.swift in Sources */,
 				EC242B712A1F8283006FE760 /* MainView.swift in Sources */,
 				EC242B6E2A1F81CC006FE760 /* UnitsManager.swift in Sources */,
 				ECC581E52A1D0C44006C55EF /* UnitVM.swift in Sources */,
+				EC5FE5A52A20882F0028AA5F /* Formatters.swift in Sources */,
 				EC242B7F2A1F83BF006FE760 /* UnitsManagerVM.swift in Sources */,
 				EC242B7B2A1F838C006FE760 /* UnitViewCell.swift in Sources */,
 				EC242B6C2A1F81AE006FE760 /* Subject.swift in Sources */,
 				EC242B8A2A1FCECA006FE760 /* AverageBlockView.swift in Sources */,
+				ECB2FFD02A23C4B700FF9F91 /* SubjectFormVM.swift in Sources */,
 				ECC581E12A1D08DB006C55EF /* SubjectVM.swift in Sources */,
 				EC242B6A2A1F8189006FE760 /* Unit.swift in Sources */,
 				EC242B752A1F8339006FE760 /* UnitView.swift in Sources */,

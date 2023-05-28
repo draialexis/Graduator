@@ -9,28 +9,39 @@ import SwiftUI
 
 struct UnitViewCell: View {
     @ObservedObject var unitVM: UnitVM
+    @ObservedObject var unitsManagerVM: UnitsManagerVM
 
     var body: some View {
         VStack {
             
             HStack {
                 Text("UE " + String(unitVM.model.code))
-                Text(unitVM.model.name)
+                    .frame(width: 40)
+                TextField("", text: $unitVM.model.name)
+                    .disabled(!unitsManagerVM.isAllEditable)
                 Spacer()
-                Text(String(unitVM.model.weight))
+                TextField("", value: $unitVM.model.weight, formatter: Formatters.weightFormatter)
+                    .frame(width: 30)
+                    .disabled(!unitsManagerVM.isAllEditable)
             }
             
-            if let average = unitVM.Average {
-                HStack {
-                    // TODO add slider linked to "grade" value
-                    // TODO link slider color to the average. If below 10.0, red, else green.
-                    Text("Sliiiiiiiiiiiiider")
-                        .background(Color.red)
-                    Text(String(format: "%.2f", average * 20))
+            HStack {
+                if let average = unitVM.Average {
+                    
+                    ProgressView(value: average, total: 1.0)
+                        .accentColor(average < 0.5 ? .red : .green)
+                        .scaleEffect(x: 1, y: 4, anchor: .center)
+                    
+                    Text(String(format: "%.2f", average * 20.0))
+                    
                     Spacer()
+
+                    Image(systemName: "snowflake.circle.fill")
+                        .foregroundColor(unitVM.IsCalled ? .primary : .gray)
+                    
+                } else {
+                    NoGradesInfo()
                 }
-            } else {
-                NoGradesInfo()
             }
 
         }
@@ -42,7 +53,15 @@ struct UnitViewCell: View {
 }
 
 struct UnitViewCell_Previews: PreviewProvider {
+    static var ManagerVMStub: UnitsManagerVM = UnitsManagerVM(
+        unitsManager: UnitsManager(
+            units: Stub.units
+        )
+    )
     static var previews: some View {
-        UnitViewCell(unitVM: UnitVM(unit: Stub.units[0]))
+        UnitViewCell(
+            unitVM: UnitVM(unit: Stub.units[0]),
+            unitsManagerVM: ManagerVMStub
+        )
     }
 }

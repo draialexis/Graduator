@@ -9,106 +9,96 @@ import SwiftUI
 
 struct SubjectViewCell: View {
     @ObservedObject var subjectVM: SubjectVM
+    @ObservedObject var unitVM: UnitVM
+    @ObservedObject var unitsManagerVM: UnitsManagerVM
+        
+    @State private var isGradeEditable = false
 
-    //TODO also allow using the unitview's navigation bar item "Edit" (makes all subjects editable, and more)
-    @State private var isEditable = false
-    
-    private let gradeFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 2
-        return formatter
-    }()
-    
-    
     var body: some View {
         HStack {
-            if isEditable {
-                VStack {
-                    Image(systemName: "checkmark.square")
-                    Button(action: {
-                        isEditable = false
-                        subjectVM.onEdited(isCancelled: true)
-                    }) {
-                        Image(systemName: "nosign.app")
-                            .padding(.top, 10.0)
-                            .foregroundColor(.pink)
-                    }
-                }
-            } else {
-                Button(action: {
-                    isEditable = true
-                    subjectVM.onEditing()
-                }) {
-                    Image(systemName: "lock")
-                }
-            }
-
             VStack {
                 HStack {
                     TextField("", text: $subjectVM.model.name)
-                        .disabled(!isEditable)
+                        .disabled(!unitsManagerVM.isAllEditable)
 
-
-                    TextField("", value: $subjectVM.model.weight, formatter: NumberFormatter())
-                        .frame(width: 20)
-                        .disabled(!isEditable)
+                    TextField("", value: $subjectVM.model.weight, formatter: Formatters.weightFormatter)
+                        .frame(width: 40)
+                        .disabled(!unitsManagerVM.isAllEditable)
                 }
 
                 HStack {
                     if let grade = subjectVM.model.grade {
+                        VStack {
+                            Toggle("", isOn: $isGradeEditable)
+                                .frame(width: 40)
+                                .onChange(of: isGradeEditable) { value in
+                                    if !value {
+                                        subjectVM.onEdited()
+                                        unitVM.updateSubject(subjectVM)
+                                        unitsManagerVM.updateUnit(unitVM)
+                                    }
+                                }
+                            Image(systemName: isGradeEditable ? "checkmark" : "lock.open")
+                        }
                         Slider(value: Binding(
                             get: { grade },
                             set: { newValue in
-                                if isEditable {
+                                if isGradeEditable {
                                     subjectVM.model.grade = newValue
                                 }
                             }
                         ), in: 0...1, step: 0.001)
                         .accentColor(grade < 0.5 ? .red : .green)
-                        .disabled(!isEditable || subjectVM.model.isCalled)
+                        .disabled(!isGradeEditable || subjectVM.model.isCalled)
 
                         TextField("", value: Binding(
                             get: { grade * 20.0 },
                             set: { newValue in
-                                if isEditable {
+                                if isGradeEditable {
                                     subjectVM.model.grade = newValue / 20.0
                                 }
                             }
-                        ), formatter: gradeFormatter)
+                        ), formatter: Formatters.gradeFormatter)
                         .frame(width: 50)
-                        .disabled(!isEditable)
+                        .disabled(!isGradeEditable || subjectVM.model.isCalled)
      
-                        Image(systemName: "snowflake.circle.fill")
-                            .foregroundColor(subjectVM.model.isCalled ? .primary : .gray)
-
-                        Toggle("", isOn: $subjectVM.model.isCalled)
-                            .frame(width: 50)
-                            .disabled(!isEditable)
+                        VStack {
+                            Toggle("", isOn: $subjectVM.model.isCalled)
+                                .frame(width: 40)
+                            Image(systemName: "snowflake.circle.fill")
+                                .foregroundColor(subjectVM.model.isCalled ? .primary : .gray)
+                        }
                         
+                       
                     } else {
                         NoGradesInfo()
                         Button(action: {
                             subjectVM.model.grade = 0.0
+                            isGradeEditable = true
                         }) {
                             Image(systemName: "pencil.line")
                         }
-                        .disabled(!isEditable)
-
                     }
                 }
+                .padding(.bottom)
             }
         }
-        .padding()
-        .background(Color.gray.opacity(0.2))
-        .cornerRadius(12)
-        .padding(.horizontal)
     }
 }
 
 
 struct SubjectViewCell_Previews: PreviewProvider {
+    static var ManagerVMStub: UnitsManagerVM = UnitsManagerVM(
+        unitsManager: UnitsManager(
+            units: Stub.units
+        )
+    )
+    
     static var previews: some View {
-        SubjectViewCell(subjectVM: SubjectVM(subject: Stub.units[0].subjects[0]))
+        SubjectViewCell(
+            subjectVM: ManagerVMStub.UnitsVM[0].SubjectsVM[0],
+            unitVM: ManagerVMStub.UnitsVM[0],
+            unitsManagerVM: ManagerVMStub
+        )
     }
 }

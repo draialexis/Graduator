@@ -44,10 +44,15 @@ struct MainView: View {
                 .padding()
                 
                 VStack(alignment: .leading) {
-                    ForEach(unitsManagerVM.UnitsVM, id: \.model.id) { unitVM in
-                        NavigationLink(
-                            destination: UnitView(unitVM: unitVM)) {
-                                UnitViewCell(unitVM: unitVM)
+                    ForEach(unitsManagerVM.UnitsVM) { unitVM in
+                        NavigationLink(destination: UnitView(
+                            unitVM: unitVM,
+                            unitsManagerVM: unitsManagerVM
+                        )) {
+                            UnitViewCell(
+                                unitVM: unitVM,
+                                unitsManagerVM: unitsManagerVM
+                            )
                         }
                     }
                 }
@@ -58,8 +63,13 @@ struct MainView: View {
 }
 
 struct MainView_Previews: PreviewProvider {
+    static var ManagerVMStub: UnitsManagerVM = UnitsManagerVM(
+        unitsManager: UnitsManager(
+            units: Stub.units
+        )
+    )
+
     static var previews: some View {
-        MainView(unitsManagerVM: UnitsManagerVM(unitsManager: UnitsManager(units: Stub.units)))
+        MainView(unitsManagerVM: ManagerVMStub)
     }
 }
-    

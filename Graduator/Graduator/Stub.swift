@@ -97,6 +97,13 @@ struct Stub {
                 ),
                 Subject(
                     id: UUID(),
+                    name: "Communication",
+                    weight: 4,
+                    grade: 17.13/20.0,
+                    isCalled: false
+                ),
+                Subject(
+                    id: UUID(),
                     name: "Économie",
                     weight: 4,
                     grade: 9.5/20.0,
@@ -107,13 +114,6 @@ struct Stub {
                     name: "Gestion",
                     weight: 3,
                     grade: 9.5/20.0,
-                    isCalled: false
-                ),
-                Subject(
-                    id: UUID(),
-                    name: "Communication",
-                    weight: 4,
-                    grade: 17.13/20.0,
                     isCalled: false
                 ),
             ]
@@ -195,7 +195,7 @@ struct Stub {
                 ),
                 Subject(
                     id: UUID(),
-                    name: "MAUI",
+                    name: "Xamarin",
                     weight: 5,
                     isCalled: false
                 ),

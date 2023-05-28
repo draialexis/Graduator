@@ -15,7 +15,7 @@ struct AverageBlockView: View {
         HStack {
             Text(title)
             Spacer()
-            Text(String(format: "%.2f", average * 20))
+            Text(String(format: "%.2f", average * 20.0))
             Image(systemName: average >= 0.5 ? "graduationcap.fill" : "exclamationmark.bubble.fill")
         }
     }

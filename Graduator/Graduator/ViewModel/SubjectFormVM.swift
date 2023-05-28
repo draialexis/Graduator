@@ -11,7 +11,6 @@ class SubjectFormVM: ObservableObject {
     @Published var name: String = ""
     @Published var weight: Int = 1
     @Published var gradeString: String = ""
-    @Published var isCalled: Bool = false
     
     var grade: Double? {
         if let gradeOverTwenty = Double(gradeString) {
@@ -22,7 +21,7 @@ class SubjectFormVM: ObservableObject {
     }
     
     func isValid(_ subject: Subject) -> Bool {
-        return !(name.isEmpty || weight <= 0 || !subject.gradeIsValid(grade) || (isCalled && grade == nil))
+        return !(name.isEmpty || weight <= 0 || !subject.gradeIsValid(grade))
     }
     
     func createSubject() -> Subject? {
@@ -30,8 +29,7 @@ class SubjectFormVM: ObservableObject {
             id: UUID(),
             name: name,
             weight: weight,
-            grade: grade,
-            isCalled: isCalled)
+            grade: grade)
         guard isValid(subject) else { return nil }
         return subject
     }

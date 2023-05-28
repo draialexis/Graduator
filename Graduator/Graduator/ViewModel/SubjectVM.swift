@@ -13,7 +13,6 @@ extension Subject {
         var name: String
         var weight: Int
         var grade: Double?
-        var isCalled: Bool
     }
     
     var data: Data {
@@ -21,19 +20,12 @@ extension Subject {
             id: self.id,
             name: self.name,
             weight: self.weight,
-            grade: self.grade,
-            isCalled: self.isCalled
+            grade: self.grade
         )
     }
     
     mutating func update(from data: Data) {
-        // papers please
         guard data.id == self.data.id else { return }
-        // can't update grade if this subject is called, unless the update is to 'un-call' the subject
-        guard !(self.isCalled && data.isCalled && self.grade != data.grade) else { return }
-        // can't update a subject to become called and have a nil grade at the same time
-        guard !(data.grade == nil && data.isCalled) else { return }
-
         if (!data.name.isEmpty) {
             self.name = data.name
         }
@@ -43,9 +35,7 @@ extension Subject {
         } else {
             self.grade = nil
         }
-        self.isCalled = data.isCalled
     }
-
 }
 
 class SubjectVM : ObservableObject, Identifiable {
@@ -63,8 +53,7 @@ class SubjectVM : ObservableObject, Identifiable {
         self.init(subject: Subject(
             id: UUID(),
             name: "",
-            weight: 1,
-            isCalled: false
+            weight: 1
         ))
     }
     

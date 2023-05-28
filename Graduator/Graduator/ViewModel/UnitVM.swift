@@ -41,8 +41,7 @@ extension Unit {
                 id: $0.id,
                 name: $0.name,
                 weight: $0.weight,
-                grade: $0.grade,
-                isCalled: $0.isCalled
+                grade: $0.grade
             )
         }
     }
@@ -116,9 +115,5 @@ class UnitVM : ObservableObject, Identifiable {
     
     var Average: Double? {
         return original.getAverage()
-    }
-
-    var IsCalled: Bool {
-        return original.subjects.allSatisfy { $0.isCalled }
     }
 }

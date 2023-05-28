@@ -2,29 +2,46 @@
 
 Graduator is an iOS application developed with SwiftUI that helps users manage their academic `units`, `subjects`, and grades. Users can add and delete `subjects`, edit the weight and name of `subjects` and `units`, and input grades. The app displays weighted averages and explains the conditions for graduating from the Clermont Auvergne Tech Institute's mobile development BSc in 2023.
 
+<img src="./docs/home.png" height="700" style="margin:20px" alt="view from the home page">
+<img src="./docs/unit.png" height="700" style="margin:20px" alt="view from a unit page">
+  
 ## Features
 
 Beyond those basic features, some details need to be specified here.
 
-### isCalled Feature
+### Weighted average
 
-The isCalled property, available for each subject, denotes whether the grade of a specific subject has been called or not -- i.e., whether it is a definitive grade or a temporary one.
+A weighted average means that a `subject` or `unit`'s weight plays a part in calculating the average. Users can observe that increasing the weight of a `subject`, for instance, will make the average of the parent `unit` tend more towards that `subject`'s grade.
 
-From the user's point of view, they can see an image of a snowflake that turns from gray to primary color when a subject grade has been called. A Toggle control allows them to set or unset the isCalled status. If they attempt to change the grade of a subject that has been called, they will not be able to -- the corresponding slider and textfield will remain disabled.
+<img src="./docs/weight_1.png" height="700" style="margin:20px" alt="before changing a subject's weight">
+<img src="./docs/weight_2.png" height="700" style="margin:20px" alt="after changing a subject's weight">
 
-In the model and view model, the `isCalled` property of `subjects` affects the state of their `unit`. If all of a `unit`'s `subject` grades are called, the `unit` is considered called too. Note that if a `subject`'s grade is not set (nil), the `subject` can't be called.
+### Deleting a `Subject`
 
-### Deleting a Subject
+In the app, users can delete a `subject` by swiping it off the list, right-to-left.
 
-In the app, users can delete a subject by swiping it off the list, right-to-left.
+<img src="./docs/delete_1.png" height="700" style="margin:20px" alt="deleting a subject">
+<img src="./docs/delete_2.png" height="700" style="margin:20px" alt="subject deleted">
 
-Note that when a subject is deleted, it is permanently removed from the system. If a user is in the process of editing and deletes a subject, the deletion occurs immediately upon swiping, not when they save (click 'OK'). If the user chooses to cancel their edits (click 'Annuler'), all other unsaved changes will be discarded, but the deletion of the subject remains.
+Note that when a `subject` is deleted, it is permanently removed from the system. If a user is in the process of editing and deletes a `subject`, the deletion occurs immediately upon swiping, not when they save (click 'OK'). If the user chooses to cancel their edits (click *'Annuler'*), all other unsaved changes will be discarded, but the deletion of the `subject` remains.
 
 ### Changing a grade
 
-Before a user changes a grade, they first need to activate the `lock.open` toggle. If the grade is *called*, they also need to use the `isCalled` toggle.
+Before a user changes a grade, they first need to activate the `lock.open` toggle.
 
-After a grade was changed, in order to save the change and to see it reflected iun the weighted average, users need to use the (previously `lock.open`, now) `checkmark` toggle.
+<img src="./docs/grade_1.png" height="700" style="margin:20px" alt="changing a grade">
+
+After a grade was changed, in order to save the change and to see it reflected in the `unit`'s weighted average, users need to use the (`lock.open` previously) `checkmark` toggle.
+
+<img src="./docs/grade_2.png" height="700" style="margin:20px" alt="grade changed">
+
+### Creating a `Subject`
+
+Finally, users can create  a `subject` when in edit mode. After clicking on *'Modifier'*, look for a `+` in the top navigation bar.
+
+<img src="./docs/create_1.png" height="700" style="margin:20px" alt="creating a subject">
+<img src="./docs/create_2.png" height="700" style="margin:20px" alt="subject created">
+ 
 
 ## Architecture
 
@@ -55,7 +72,6 @@ classDiagram
         +deleteSubject(subjectVM: SubjectVM): Void
         +addSubject(subject: Subject): Void
         +Average: Double?
-        +IsCalled: Bool
     }
 
     class UnitView {
@@ -68,7 +84,6 @@ classDiagram
         +name: String
         +weight: Int
         +grade: Double?
-        +isCalled: Bool
         +gradeIsValid(grade: Double?): Bool
         +data: Data
         +update(from: Data): Void
@@ -123,9 +138,14 @@ classDiagram
     MainView -- UnitsManagerVM : Observes
 ```
 
+
+
 It might be useful to note that, just like `UnitVM`s aggregate `SubjectVM`s, `Unit`s aggregate `Subject`s, but these relationship between `Model` entities were removed from the diagram above for clarity. 
 
 Here is the diagram with those relationships depicted.
+
+
+
 
 ```mermaid
 classDiagram
@@ -152,7 +172,6 @@ classDiagram
         +deleteSubject(subjectVM: SubjectVM): Void
         +addSubject(subject: Subject): Void
         +Average: Double?
-        +IsCalled: Bool
     }
 
     class UnitView {
@@ -165,7 +184,6 @@ classDiagram
         +name: String
         +weight: Int
         +grade: Double?
-        +isCalled: Bool
         +gradeIsValid(grade: Double?): Bool
         +data: Data
         +update(from: Data): Void

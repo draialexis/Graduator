@@ -31,8 +31,7 @@ extension UnitsManager {
                         id: $0.id,
                         name: $0.name,
                         weight: $0.weight,
-                        grade: $0.grade,
-                        isCalled: $0.isCalled
+                        grade: $0.grade
                     )
                 }
             )

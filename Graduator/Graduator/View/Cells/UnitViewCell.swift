@@ -35,10 +35,6 @@ struct UnitViewCell: View {
                     Text(String(format: "%.2f", average * 20.0))
                     
                     Spacer()
-
-                    Image(systemName: "snowflake.circle.fill")
-                        .foregroundColor(unitVM.IsCalled ? .primary : .gray)
-                    
                 } else {
                     NoGradesInfo()
                 }

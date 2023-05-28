@@ -12,7 +12,6 @@ struct Subject : Identifiable {
     var name: String
     var weight: Int
     var grade: Double?
-    var isCalled: Bool
     
     func gradeIsValid(_ grade: Double?) -> Bool {
         return grade == nil || (grade! >= 0 && grade! <= 1)

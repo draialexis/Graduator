@@ -27,7 +27,6 @@ struct SubjectFormView: View {
                 Spacer()
                 TextField("Note", text: $formVM.gradeString)
             }
-            Toggle("Note définitive?", isOn: $formVM.isCalled)
         }
     }
 }

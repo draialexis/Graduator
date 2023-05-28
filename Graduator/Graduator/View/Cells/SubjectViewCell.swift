@@ -49,7 +49,7 @@ struct SubjectViewCell: View {
                             }
                         ), in: 0...1, step: 0.001)
                         .accentColor(grade < 0.5 ? .red : .green)
-                        .disabled(!isGradeEditable || subjectVM.model.isCalled)
+                        .disabled(!isGradeEditable)
 
                         TextField("", value: Binding(
                             get: { grade * 20.0 },
@@ -60,16 +60,7 @@ struct SubjectViewCell: View {
                             }
                         ), formatter: Formatters.gradeFormatter)
                         .frame(width: 50)
-                        .disabled(!isGradeEditable || subjectVM.model.isCalled)
-     
-                        VStack {
-                            Toggle("", isOn: $subjectVM.model.isCalled)
-                                .frame(width: 40)
-                            Image(systemName: "snowflake.circle.fill")
-                                .foregroundColor(subjectVM.model.isCalled ? .primary : .gray)
-                        }
-                        
-                       
+                        .disabled(!isGradeEditable)
                     } else {
                         NoGradesInfo()
                         Button(action: {

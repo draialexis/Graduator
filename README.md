@@ -45,41 +45,64 @@ Finally, users can create  a `subject` when in edit mode. After clicking on *'Mo
 
 ## Architecture
 
-Graduator is based on the MVVM (Model-View-ViewModel) architectural pattern. The below UML class diagram details the structure of the models, viewmodels, and views for `UnitsManager`, `Unit`, and `Subject`.
+Graduator is based on the MVVM (Model-View-ViewModel) architectural pattern. The below UML class diagram details
+the structure of the models, viewmodels, and views for `UnitsManager`, `Unit`, and `Subject`. Notice how,
+to circumvent [this issue](https://codefirst.iut.uca.fr/documentation/mchSamples_Apple/docusaurus/iOS_MVVM_guide/docs/viewModels/changeNotifications/problematic/),
+we insert an entire hierarchy of VMs in certain views, so that they can update all those VMs when a detail gets edited. It's dirty, and it's staying that way for the foreseeable future.
 
 ```mermaid
 classDiagram
+
+    class MainView
+    class UnitView
+    class SubjectViewCell
+
+    class UnitsManagerVM {
+        -original: UnitsManager
+        +model: UnitsManager.Data
+        +isEdited: Bool
+        +isAllEditable: Bool
+        +updateUnit(unitVM: UnitVM): Void
+        +TotalAverage: Double?
+        +ProfessionalAverage: Double?
+    }
+    class UnitVM {
+        -original: Unit
+        +model: Unit.Data
+        +isEdited: Bool
+        +onEditing()
+        +onEdited(isCancelled: Bool)
+        +updateSubject(subjectVM: SubjectVM)
+        +updateAllSubjects()
+        +deleteSubject(subjectVM: SubjectVM)
+        +addSubject(subject: Subject)
+        +Average: Double?
+    }
+    class SubjectVM {
+        -original: Subject
+        +model: Subject.Data
+        +isEdited: Bool
+        +onEditing(): Void
+        +onEdited(isCancelled: Bool): Void
+    }
+    
+    class UnitsManager {
+        +getTotalAverage(): Double?
+        +getProfessionalAverage(): Double?
+        +getAverage(units: Unit[]): Double?
+        +data: Data
+        +update(from: Data): Void
+    }
     class Unit {
         +name: String
         +weight: Int
         +isProfessional: Bool
         +code: Int
-        +subjects: [Subject]
+        +subjects: Subject[]
         +getAverage(): Double?
         +data: Data
         +update(from: Data): Void
     }
-
-    class UnitVM {
-        -original: Unit
-        +model: Unit.Data
-        +isEdited: Bool
-        +SubjectsVM: [SubjectVM]
-        +onEditing(): Void
-        +onEdited(isCancelled: Bool): Void
-        +updateSubject(subjectVM: SubjectVM): Void
-        +updateAllSubjects(): Void
-        +deleteSubject(subjectVM: SubjectVM): Void
-        +addSubject(subject: Subject): Void
-        +Average: Double?
-    }
-
-    class UnitView {
-        -unitVM: UnitVM
-        -unitsManagerVM: UnitsManagerVM
-        +delete(at: IndexSet): Void
-    }
-
     class Subject {
         +name: String
         +weight: Int
@@ -89,58 +112,25 @@ classDiagram
         +update(from: Data): Void
     }
 
-    class SubjectVM {
-        -original: Subject
-        +model: Subject.Data
-        +isEdited: Bool
-        +onEditing(): Void
-        +onEdited(isCancelled: Bool): Void
-    }
+    MainView --> UnitsManagerVM
+    UnitView --> UnitVM
+    UnitView --> UnitsManagerVM
+    SubjectViewCell --> SubjectVM
+    SubjectViewCell --> UnitVM
+    SubjectViewCell --> UnitsManagerVM
 
-    class SubjectViewCell {
-        -subjectVM: SubjectVM
-        -unitVM: UnitVM
-        -unitsManagerVM: UnitsManagerVM
-        -isGradeEditable: Bool
-    }
-
-    class UnitsManager {
-        +units: [Unit]
-        +getTotalAverage(): Double?
-        +getProfessionalAverage(): Double?
-        +getAverage(units: [Unit]): Double?
-        +data: Data
-        +update(from: Data): Void
-    }
-
-    class UnitsManagerVM {
-        -original: UnitsManager
-        +model: UnitsManager.Data
-        +isEdited: Bool
-        +isAllEditable: Bool
-        +UnitsVM: [UnitVM]
-        +updateUnit(unitVM: UnitVM): Void
-        +TotalAverage: Double?
-        +ProfessionalAverage: Double?
-    }
-
-    class MainView {
-        -unitsManagerVM: UnitsManagerVM
-    }
-
-    UnitVM -- Unit : Uses
-    UnitView -- UnitVM : Observes
-    SubjectVM -- Subject : Uses
-    SubjectViewCell -- SubjectVM : Observes
-    UnitVM "1" o-- "*" SubjectVM : Contains
-    UnitsManagerVM -- UnitsManager : Uses
-    UnitsManagerVM "1" o-- "*" UnitVM : Contains
-    MainView -- UnitsManagerVM : Observes
+    UnitsManagerVM --> "*" UnitVM
+    UnitsManagerVM --> UnitsManager
+    UnitVM --> "*" SubjectVM
+    UnitVM --> Unit
+    SubjectVM --> Subject
 ```
 
 
 
-It might be useful to note that, just like `UnitVM`s aggregate `SubjectVM`s, `Unit`s aggregate `Subject`s, but these relationship between `Model` entities were removed from the diagram above for clarity. 
+It might be useful to note that, just like `UnitVM`s aggregate `SubjectVM`s, `Unit`s aggregate
+`Subject`s, but these relationship between `Model` entities were removed from the diagram above for clarity.
+The same is true with the View-related classes.
 
 Here is the diagram with those relationships depicted.
 
@@ -149,93 +139,81 @@ Here is the diagram with those relationships depicted.
 
 ```mermaid
 classDiagram
-    class Unit {
-        +name: String
-        +weight: Int
-        +isProfessional: Bool
-        +code: Int
-        +subjects: [Subject]
-        +getAverage(): Double?
-        +data: Data
-        +update(from: Data): Void
-    }
 
-    class UnitVM {
-        -original: Unit
-        +model: Unit.Data
-        +isEdited: Bool
-        +SubjectsVM: [SubjectVM]
-        +onEditing(): Void
-        +onEdited(isCancelled: Bool): Void
-        +updateSubject(subjectVM: SubjectVM): Void
-        +updateAllSubjects(): Void
-        +deleteSubject(subjectVM: SubjectVM): Void
-        +addSubject(subject: Subject): Void
-        +Average: Double?
-    }
-
-    class UnitView {
-        -unitVM: UnitVM
-        -unitsManagerVM: UnitsManagerVM
-        +delete(at: IndexSet): Void
-    }
-
-    class Subject {
-        +name: String
-        +weight: Int
-        +grade: Double?
-        +gradeIsValid(grade: Double?): Bool
-        +data: Data
-        +update(from: Data): Void
-    }
-
-    class SubjectVM {
-        -original: Subject
-        +model: Subject.Data
-        +isEdited: Bool
-        +onEditing(): Void
-        +onEdited(isCancelled: Bool): Void
-    }
-
-    class SubjectViewCell {
-        -subjectVM: SubjectVM
-        -unitVM: UnitVM
-        -unitsManagerVM: UnitsManagerVM
-        -isGradeEditable: Bool
-    }
-
-    class UnitsManager {
-        +units: [Unit]
-        +getTotalAverage(): Double?
-        +getProfessionalAverage(): Double?
-        +getAverage(units: [Unit]): Double?
-        +data: Data
-        +update(from: Data): Void
-    }
+    class MainView
+    class UnitView
+    class SubjectViewCell
 
     class UnitsManagerVM {
         -original: UnitsManager
         +model: UnitsManager.Data
         +isEdited: Bool
         +isAllEditable: Bool
-        +UnitsVM: [UnitVM]
-        +updateUnit(unitVM: UnitVM): Void
+        +updateUnit(unitVM: UnitVM)
         +TotalAverage: Double?
         +ProfessionalAverage: Double?
     }
-
-    class MainView {
-        -unitsManagerVM: UnitsManagerVM
+    class UnitVM {
+        -original: Unit
+        +model: Unit.Data
+        +isEdited: Bool
+        +onEditing()
+        +onEdited(isCancelled: Bool)
+        +updateSubject(subjectVM: SubjectVM)
+        +updateAllSubjects()
+        +deleteSubject(subjectVM: SubjectVM)
+        +addSubject(subject: Subject)
+        +Average: Double?
+    }
+    class SubjectVM {
+        -original: Subject
+        +model: Subject.Data
+        +isEdited: Bool
+        +onEditing()
+        +onEdited(isCancelled: Bool)
     }
 
-    UnitVM -- Unit : Uses
-    UnitView -- UnitVM : Observes
-    SubjectVM -- Subject : Uses
-    SubjectViewCell -- SubjectVM : Observes
-    UnitVM "1" o-- "*" SubjectVM : Contains
-    Unit "1" o-- "*" Subject : Contains
-    UnitsManagerVM -- UnitsManager : Uses
-    UnitsManagerVM "1" o-- "*" UnitVM : Contains
-    UnitsManager "1" o-- "*" Unit : Contains
-    MainView -- UnitsManagerVM : Observes
+
+    class UnitsManager {
+        +getTotalAverage(): Double?
+        +getProfessionalAverage(): Double?
+        +getAverage(units: Unit[]): Double?
+        +data: Data
+        +update(from: Data)
+    }
+    class Unit {
+        +name: String
+        +weight: Int
+        +isProfessional: Bool
+        +code: Int
+        +getAverage(): Double?
+        +data: Data
+        +update(from: Data)
+    }
+    class Subject {
+        +name: String
+        +weight: Int
+        +grade: Double?
+        +gradeIsValid(grade: Double?): Bool
+        +data: Data
+        +update(from: Data)
+    }
+
+    MainView --> "*" UnitView
+    MainView --> UnitsManagerVM
+    UnitView --> "*" SubjectViewCell
+    UnitView --> UnitVM
+    UnitView --> UnitsManagerVM
+    SubjectViewCell --> SubjectVM
+    SubjectViewCell --> UnitVM
+    SubjectViewCell --> UnitsManagerVM
+
+    UnitsManagerVM --> "*" UnitVM
+    UnitsManagerVM --> UnitsManager
+    UnitVM --> "*" SubjectVM
+    UnitVM --> Unit
+    SubjectVM --> Subject
+
+    UnitsManager --> "*" Unit
+    Unit --> "*" Subject
 ```

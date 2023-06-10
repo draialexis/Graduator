@@ -14,6 +14,13 @@ struct GraduatorApp: App {
     var body: some Scene {
         WindowGroup {
             MainView(unitsManagerVM: unitsManagerVM)
+                .task {
+                    do {
+                        try await unitsManagerVM.load()
+                    } catch {
+                        fatalError(error.localizedDescription)
+                    }
+                }
                 .environmentObject(unitsManagerVM)
         }
     }

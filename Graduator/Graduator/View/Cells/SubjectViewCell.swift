@@ -33,9 +33,16 @@ struct SubjectViewCell: View {
                                 .frame(width: 40)
                                 .onChange(of: isGradeEditable) { value in
                                     if !value {
-                                        subjectVM.onEdited()
-                                        unitVM.updateSubject(subjectVM)
-                                        unitsManagerVM.updateUnit(unitVM)
+                                        Task {
+                                            do {
+                                                subjectVM.onEdited()
+                                                unitVM.updateSubject(subjectVM)
+                                                try await unitsManagerVM.updateUnit(unitVM)
+                                            } catch {
+                                                // DEV: this should be replaced with proper error handling before ever going to prod
+                                                print("ERROR: Failed to update grade: \(error)")
+                                            }
+                                        }
                                     }
                                 }
                             Image(systemName: isGradeEditable ? "checkmark" : "lock.open")

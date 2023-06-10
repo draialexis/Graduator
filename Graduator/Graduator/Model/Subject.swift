@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Subject : Identifiable {
+struct Subject : Identifiable, Codable, WeightedGrade {
     let id: UUID
     var name: String
     var weight: Int

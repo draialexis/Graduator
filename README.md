@@ -9,6 +9,14 @@ Graduator is an iOS application developed with SwiftUI that helps users manage t
 
 Beyond those basic features, some details need to be specified here.
 
+### Persistence
+
+The data is set to be persisted, unless you're using XCode's previewer canvas. 
+
+The local persistence solution has been tested manually on the iOS Simulator.
+
+Upon first launching the app, it is set up to load a stub.
+
 ### Weighted average
 
 A weighted average means that a `subject` or `unit`'s weight plays a part in calculating the average. Users can observe that increasing the weight of a `subject`, for instance, will make the average of the parent `unit` tend more towards that `subject`'s grade.
@@ -39,6 +47,7 @@ After a grade was changed, in order to save the change and to see it reflected i
 
 Finally, users can create  a `subject` when in edit mode. After clicking on *'Modifier'*, look for a `+` in the top navigation bar.
 
+<img src="./docs/delete_2.png" height="700" style="margin:20px" alt="subject deleted">
 <img src="./docs/create_1.png" height="700" style="margin:20px" alt="creating a subject">
 <img src="./docs/create_2.png" height="700" style="margin:20px" alt="subject created">
  
@@ -130,9 +139,9 @@ classDiagram
 
 It might be useful to note that, just like `UnitVM`s aggregate `SubjectVM`s, `Unit`s aggregate
 `Subject`s, but these relationship between `Model` entities were removed from the diagram above for clarity.
-The same is true with the View-related classes.
+The same is true with the `View`-related classes.
 
-Here is the diagram with those relationships depicted.
+Here is the diagram with those relationships depicted, and the local persistence solution added.
 
 
 
@@ -146,6 +155,7 @@ classDiagram
 
     class UnitsManagerVM {
         -original: UnitsManager
+        +load()
         +model: UnitsManager.Data
         +isEdited: Bool
         +isAllEditable: Bool
@@ -175,6 +185,9 @@ classDiagram
 
 
     class UnitsManager {
+        -store: UnitsStore
+        +save()
+        +load()
         +getTotalAverage(): Double?
         +getProfessionalAverage(): Double?
         +getAverage(units: Unit[]): Double?
@@ -198,6 +211,11 @@ classDiagram
         +data: Data
         +update(from: Data)
     }
+    
+    class UnitsStore {
+        +load<T: Codable>(defaultValue: T[])
+        +save<T: Codable>(elements: T[])
+    }
 
     MainView --> "*" UnitView
     MainView --> UnitsManagerVM
@@ -215,5 +233,8 @@ classDiagram
     SubjectVM --> Subject
 
     UnitsManager --> "*" Unit
+    UnitsManager --> UnitsStore
+    UnitsManager --> Stub
+    Stub --> "*" Unit
     Unit --> "*" Subject
 ```

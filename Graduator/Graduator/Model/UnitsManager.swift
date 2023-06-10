@@ -10,28 +10,37 @@ import Foundation
 struct UnitsManager {
     
     var units: [Unit]
+    private var store = UnitsStore()
+
+    public init(units: [Unit] = [], store: UnitsStore = UnitsStore()) {
+        self.units = units
+        self.store = store
+    }
+    
+    mutating func load() async throws {
+        do {
+            self.units = try await store.load(defaultValue: Stub.units)
+        } catch {
+            // DEV: this should be replaced with proper error handling before ever going to prod
+            print("ERROR: Failed to load...")
+        }
+    }
+    
+    func save() async throws {
+        do {
+            try await store.save(elements: units)
+        } catch {
+            // DEV: this should be replaced with proper error handling before ever going to prod
+            print("ERROR: Failed to save...")
+        }
+    }
     
     func getTotalAverage() -> Double? {
-        return getAverage(units: units)
+        return WeightedAverageCalculator.average(elements: units)
     }
     
     func getProfessionalAverage() -> Double? {
-        return getAverage(units: units.filter { $0.isProfessional })
-    }
-    
-    func getAverage(units: [Unit]) -> Double? {
-        var totalWeight = 0
-        var weightedSum = 0.0
-
-        for unit in units {
-            if let grade = unit.getAverage() {
-                totalWeight += unit.weight
-                weightedSum += grade * Double(unit.weight)
-            }
-        }
-        
-        guard totalWeight > 0 else { return nil }
-        
-        return weightedSum / Double(totalWeight)
+        let professionalUnits = units.filter { $0.isProfessional }
+        return WeightedAverageCalculator.average(elements: professionalUnits)
     }
 }

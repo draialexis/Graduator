@@ -121,7 +121,7 @@ struct Stub {
                 ),
                 Subject(
                     id: UUID(),
-                    name: "Architecture de projetc C# .NET (1)",
+                    name: "Architecture de projet C# .NET (1)",
                     weight: 5,
                     grade: 14.5/20.0
                 ),
@@ -148,7 +148,7 @@ struct Stub {
             subjects: [
                 Subject(
                     id: UUID(),
-                    name: "Architecture de projetc C# .NET (2)",
+                    name: "Architecture de projet C# .NET (2)",
                     weight: 4,
                     grade: 12.17/20.0
                 ),

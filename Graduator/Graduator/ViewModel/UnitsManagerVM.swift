@@ -44,9 +44,8 @@ class UnitsManagerVM : ObservableObject {
     
     private var original: UnitsManager
     @Published var model: UnitsManager.Data
-    @Published var isEdited: Bool = false
     @Published var isAllEditable: Bool = false
-
+    
     private var unitsVM: [UnitVM]
     
     public var UnitsVM: [UnitVM] { unitsVM }
@@ -54,18 +53,39 @@ class UnitsManagerVM : ObservableObject {
     init(unitsManager: UnitsManager) {
         original = unitsManager
         model = original.data
-        unitsVM = unitsManager.units.map { UnitVM(unit: $0) }
+        unitsVM = original.units.map { UnitVM(unit: $0) }
     }
     
     convenience init() {
         self.init(unitsManager: UnitsManager(units: []))
     }
     
-    func updateUnit(_ unitVM: UnitVM) {
+    func load() async throws {
+        do {
+            try await original.load()
+            DispatchQueue.main.async {
+                self.model = self.original.data
+                self.unitsVM = self.original.units.map { UnitVM(unit: $0) }
+            }
+        } catch {
+            // DEV: this should be replaced with proper error handling before ever going to prod
+            print("ERROR: Failed to load VM...")
+        }
+    }
+    
+    func updateUnit(_ unitVM: UnitVM) async throws {
         guard let index = unitsVM.firstIndex(where: { $0.id == unitVM.id }) else { return }
         let updatedUnit = unitsVM[index].model
         original.units[index].update(from: updatedUnit)
-        model = original.data
+        do {
+            try await original.save()
+            DispatchQueue.main.async {
+                self.model = self.original.data
+            }
+        } catch {
+            // DEV: this should be replaced with proper error handling before ever going to prod
+            print("ERROR: Failed to save VM...")
+        }
     }
     
     var TotalAverage: Double? {

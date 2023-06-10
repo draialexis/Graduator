@@ -19,7 +19,6 @@ struct UnitView: View {
         guard let index = offsets.first else { return }
         let subjectVMToDelete = unitVM.SubjectsVM[index]
         unitVM.deleteSubject(subjectVMToDelete)
-        unitsManagerVM.updateUnit(unitVM)
     }
     
     var body: some View {
@@ -77,16 +76,25 @@ struct UnitView: View {
                         Image(systemName: "plus")
                     }
                     Button(action: {
+                        unitVM.isEdited = false
                         unitsManagerVM.isAllEditable.toggle()
                         unitVM.onEdited(isCancelled: true)
+                        unitVM.SubjectsVM.forEach { $0.onEdited(isCancelled: true) }
                     }) {
                         Text("Annuler")
                     }
                     Button(action: {
-                        unitsManagerVM.isAllEditable.toggle()
-                        unitVM.onEdited()
-                        unitVM.updateAllSubjects()
-                        unitsManagerVM.updateUnit(unitVM)
+                        Task {
+                            do {
+                                unitsManagerVM.isAllEditable.toggle()
+                                unitVM.onEdited()
+                                unitVM.updateAllSubjects()
+                                try await unitsManagerVM.updateUnit(unitVM)
+                            } catch {
+                                // DEV: this should be replaced with proper error handling before ever going to prod
+                                print("ERROR: Failed to update unit: \(error)")
+                            }
+                        }
                     }) {
                         Text("OK")
                     }
@@ -107,9 +115,16 @@ struct UnitView: View {
                             leading: Button("Annuler") { showingForm = false },
                             trailing: Button("Enregistrer") {
                                 if let newSubject = formVM.createSubject() {
-                                    unitVM.addSubject(newSubject)
-                                    unitsManagerVM.updateUnit(unitVM)
-                                    showingForm = false
+                                    Task {
+                                        do {
+                                            unitVM.addSubject(newSubject)
+                                            try await unitsManagerVM.updateUnit(unitVM)
+                                            showingForm = false
+                                        } catch {
+                                            // DEV: this should be replaced with proper error handling before ever going to prod
+                                            print("ERROR: Failed to create unit: \(error)")
+                                        }
+                                    }
                                 } else {
                                     showAlert = true
                                 }
@@ -124,6 +139,7 @@ struct UnitView: View {
         // If user navigates back while editing but before clicking 'OK', the changes are cancelled
         .onDisappear(perform: {
             if unitsManagerVM.isAllEditable {
+                unitVM.isEdited = false
                 unitVM.onEdited(isCancelled: true)
                 unitsManagerVM.isAllEditable = false
             }

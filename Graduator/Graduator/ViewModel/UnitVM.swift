@@ -60,7 +60,7 @@ class UnitVM : ObservableObject, Identifiable {
     init(unit: Unit) {
         original = unit
         model = original.data
-        subjectsVM = unit.subjects.map { SubjectVM(subject: $0) }
+        subjectsVM = original.subjects.map { SubjectVM(subject: $0) }
     }
     
     convenience init() {

@@ -19,6 +19,9 @@
 		EC242B882A1FC605006FE760 /* NoGradesInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC242B872A1FC605006FE760 /* NoGradesInfo.swift */; };
 		EC242B8A2A1FCECA006FE760 /* AverageBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC242B892A1FCECA006FE760 /* AverageBlockView.swift */; };
 		EC5FE5A52A20882F0028AA5F /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC5FE5A42A20882F0028AA5F /* Formatters.swift */; };
+		EC8BAD162A3465230062226B /* UnitsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC8BAD152A3465230062226B /* UnitsStore.swift */; };
+		EC8BAD1A2A34BC170062226B /* WeightedGrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC8BAD192A34BC170062226B /* WeightedGrade.swift */; };
+		EC8BAD1C2A34BE4C0062226B /* WeightedAverageCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC8BAD1B2A34BE4C0062226B /* WeightedAverageCalculator.swift */; };
 		ECB2FFCE2A23C4A700FF9F91 /* SubjectFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB2FFCD2A23C4A700FF9F91 /* SubjectFormView.swift */; };
 		ECB2FFD02A23C4B700FF9F91 /* SubjectFormVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB2FFCF2A23C4B700FF9F91 /* SubjectFormVM.swift */; };
 		ECC581D22A1D085B006C55EF /* GraduatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECC581D12A1D085B006C55EF /* GraduatorApp.swift */; };
@@ -41,6 +44,9 @@
 		EC242B872A1FC605006FE760 /* NoGradesInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoGradesInfo.swift; sourceTree = "<group>"; };
 		EC242B892A1FCECA006FE760 /* AverageBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AverageBlockView.swift; sourceTree = "<group>"; };
 		EC5FE5A42A20882F0028AA5F /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
+		EC8BAD152A3465230062226B /* UnitsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitsStore.swift; sourceTree = "<group>"; };
+		EC8BAD192A34BC170062226B /* WeightedGrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightedGrade.swift; sourceTree = "<group>"; };
+		EC8BAD1B2A34BE4C0062226B /* WeightedAverageCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightedAverageCalculator.swift; sourceTree = "<group>"; };
 		ECB2FFCD2A23C4A700FF9F91 /* SubjectFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectFormView.swift; sourceTree = "<group>"; };
 		ECB2FFCF2A23C4B700FF9F91 /* SubjectFormVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubjectFormVM.swift; sourceTree = "<group>"; };
 		ECC581CE2A1D085B006C55EF /* Graduator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Graduator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,6 +114,14 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		EC8BAD142A34650D0062226B /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				EC8BAD152A3465230062226B /* UnitsStore.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
 		ECB2FFCC2A23C49500FF9F91 /* Forms */ = {
 			isa = PBXGroup;
 			children = (
@@ -135,12 +149,12 @@
 		ECC581D02A1D085B006C55EF /* Graduator */ = {
 			isa = PBXGroup;
 			children = (
+				EC8BAD142A34650D0062226B /* Data */,
 				ECE6E3C02A1F80F6004FE471 /* Model */,
 				ECC581DF2A1D08C3006C55EF /* ViewModel */,
 				EC242B6F2A1F8260006FE760 /* View */,
 				ECC581D12A1D085B006C55EF /* GraduatorApp.swift */,
 				EC242B702A1F8283006FE760 /* MainView.swift */,
-				EC242B822A1FAA9B006FE760 /* Stub.swift */,
 				ECC581D52A1D085C006C55EF /* Assets.xcassets */,
 				ECC581D72A1D085C006C55EF /* Preview Content */,
 			);
@@ -169,9 +183,12 @@
 		ECE6E3C02A1F80F6004FE471 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				EC242B822A1FAA9B006FE760 /* Stub.swift */,
 				EC242B6B2A1F81AE006FE760 /* Subject.swift */,
 				EC242B692A1F8189006FE760 /* Unit.swift */,
 				EC242B6D2A1F81CC006FE760 /* UnitsManager.swift */,
+				EC8BAD192A34BC170062226B /* WeightedGrade.swift */,
+				EC8BAD1B2A34BE4C0062226B /* WeightedAverageCalculator.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -251,8 +268,11 @@
 				EC242B6E2A1F81CC006FE760 /* UnitsManager.swift in Sources */,
 				ECC581E52A1D0C44006C55EF /* UnitVM.swift in Sources */,
 				EC5FE5A52A20882F0028AA5F /* Formatters.swift in Sources */,
+				EC8BAD162A3465230062226B /* UnitsStore.swift in Sources */,
 				EC242B7F2A1F83BF006FE760 /* UnitsManagerVM.swift in Sources */,
 				EC242B7B2A1F838C006FE760 /* UnitViewCell.swift in Sources */,
+				EC8BAD1C2A34BE4C0062226B /* WeightedAverageCalculator.swift in Sources */,
+				EC8BAD1A2A34BC170062226B /* WeightedGrade.swift in Sources */,
 				EC242B6C2A1F81AE006FE760 /* Subject.swift in Sources */,
 				EC242B8A2A1FCECA006FE760 /* AverageBlockView.swift in Sources */,
 				ECB2FFD02A23C4B700FF9F91 /* SubjectFormVM.swift in Sources */,

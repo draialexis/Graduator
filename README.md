@@ -129,13 +129,13 @@ It's clunky, it's fragile -- but it's working and so, for lack of time, it's sta
 
 ## Architecture
 
+### Focusing on VMs
+
 Graduator is based on the MVVM (Model-View-ViewModel) architectural pattern. The below UML class diagram details
 the structure of the models, viewmodels, and views for `UnitsManager`, `Unit`, and `Subject`. Notice how, as discussed in [this subpart](#change-notifications-are-not-implemented-per-se),
 to circumvent [this issue](https://codefirst.iut.uca.fr/documentation/mchSamples_Apple/docusaurus/iOS_MVVM_guide/docs/viewModels/changeNotifications/problematic/),
 we insert an entire hierarchy of VMs in certain views, so that they can update all those VMs when a detail gets edited. 
 It's dirty, and it's staying that way for the foreseeable future.
-
-### Focusing on VMs
 
 ```mermaid
 classDiagram
